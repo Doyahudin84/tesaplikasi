@@ -10,27 +10,32 @@ def load_excel(file):
 
 # Fungsi untuk membuat grafik berdasarkan data
 def plot_chart(df, x_column, y_column, chart_type):
-    plt.figure(figsize=(10, 6))
+    # Membuat objek figure dan axes
+    fig, ax = plt.subplots(figsize=(10, 6))
     
+    # Menentukan grafik berdasarkan pilihan
     if chart_type == 'Line':
-        plt.plot(df[x_column], df[y_column], marker='o')
-        plt.title(f'Line Chart: {x_column} vs {y_column}')
-        plt.xlabel(x_column)
-        plt.ylabel(y_column)
+        ax.plot(df[x_column], df[y_column], marker='o')
+        ax.set_title(f'Line Chart: {x_column} vs {y_column}')
+        ax.set_xlabel(x_column)
+        ax.set_ylabel(y_column)
     elif chart_type == 'Bar':
-        plt.bar(df[x_column], df[y_column])
-        plt.title(f'Bar Chart: {x_column} vs {y_column}')
-        plt.xlabel(x_column)
-        plt.ylabel(y_column)
+        ax.bar(df[x_column], df[y_column])
+        ax.set_title(f'Bar Chart: {x_column} vs {y_column}')
+        ax.set_xlabel(x_column)
+        ax.set_ylabel(y_column)
     elif chart_type == 'Scatter':
-        plt.scatter(df[x_column], df[y_column])
-        plt.title(f'Scatter Plot: {x_column} vs {y_column}')
-        plt.xlabel(x_column)
-        plt.ylabel(y_column)
-
-    # Tampilkan grafik
-    st.pyplot(plt)
+        ax.scatter(df[x_column], df[y_column])
+        ax.set_title(f'Scatter Plot: {x_column} vs {y_column}')
+        ax.set_xlabel(x_column)
+        ax.set_ylabel(y_column)
     
+    # Menampilkan grafik pada Streamlit
+    st.pyplot(fig)
+
+    # Mengembalikan objek figure untuk penyimpanan
+    return fig
+
 # Layout Streamlit
 st.title('Visualisasi Data Excel by Doya')
 st.markdown("""
@@ -41,6 +46,7 @@ st.markdown("""
     - Klik tombol **Generate Chart** untuk melihat hasil visualisasi Anda.
     - Setelah itu, Anda dapat mengunduh grafik dalam format PNG dengan tombol unduh yang tersedia.
 """)
+
 # Upload file Excel
 uploaded_file = st.file_uploader("Upload an Excel file", type=["xlsx"])
 
@@ -62,20 +68,18 @@ if uploaded_file is not None:
     # Pilih jenis chart
     chart_type = st.selectbox('Pilih jenis chart', ['Line', 'Bar', 'Scatter'])
     
-
     # Menampilkan tombol untuk menghasilkan chart
     st.markdown("### Klik tombol di bawah untuk menghasilkan grafik:")
     if st.button('Generate Chart'):
-        # Fungsi untuk menggambar chart berdasarkan kolom x, y, dan jenis chart yang dipilih
+        # Menghasilkan chart berdasarkan input pengguna
         fig = plot_chart(df, x_column, y_column, chart_type)
         
         # Menyimpan chart sebagai gambar PNG ke dalam buffer
         buf = io.BytesIO()
         fig.savefig(buf, format="png")
         buf.seek(0)
-
+        
         # Menampilkan tombol unduh untuk mengunduh chart sebagai file PNG
-        st.markdown("### Klik di bawah untuk mengunduh grafik sebagai PNG:")
         st.download_button(
             label="Download Chart as PNG",
             data=buf,
@@ -84,4 +88,3 @@ if uploaded_file is not None:
         )
 else:
     st.info("Silakan upload file Excel untuk memulai visualisasi.")
-
