@@ -30,7 +30,7 @@ def plot_chart(df, x_column, y_column, chart_type):
 
     # Tampilkan grafik
     st.pyplot(plt)
-
+    
 # Layout Streamlit
 st.title('Visualisasi Data Excel by Doya')
 st.markdown("""
