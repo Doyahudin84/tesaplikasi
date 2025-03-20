@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import io
 
 # Fungsi untuk membaca file Excel
 def load_excel(file):
@@ -31,8 +32,15 @@ def plot_chart(df, x_column, y_column, chart_type):
     st.pyplot(plt)
 
 # Layout Streamlit
-st.title('Excel Data Upload and Custom Chart Generator')
-
+st.title('Visualisasi Data Excel by Doya')
+st.markdown("""
+    **Selamat datang di aplikasi Visualisasi Data Excel!**
+    - Untuk memulai, silakan **upload file Excel** yang berisi data yang ingin Anda visualisasikan.
+    - Setelah file diupload, pilih kolom mana yang akan digunakan untuk sumbu X dan Y.
+    - Pilih jenis grafik yang ingin Anda lihat: **Line**, **Bar**, atau **Scatter**.
+    - Klik tombol **Generate Chart** untuk melihat hasil visualisasi Anda.
+    - Setelah itu, Anda dapat mengunduh grafik dalam format PNG dengan tombol unduh yang tersedia.
+""")
 # Upload file Excel
 uploaded_file = st.file_uploader("Upload an Excel file", type=["xlsx"])
 
@@ -54,6 +62,26 @@ if uploaded_file is not None:
     # Pilih jenis chart
     chart_type = st.selectbox('Pilih jenis chart', ['Line', 'Bar', 'Scatter'])
     
-    # Menampilkan grafik berdasarkan pilihan
+
+    # Menampilkan tombol untuk menghasilkan chart
+    st.markdown("### Klik tombol di bawah untuk menghasilkan grafik:")
     if st.button('Generate Chart'):
-        plot_chart(df, x_column, y_column, chart_type)
+        # Fungsi untuk menggambar chart berdasarkan kolom x, y, dan jenis chart yang dipilih
+        fig = plot_chart(df, x_column, y_column, chart_type)
+        
+        # Menyimpan chart sebagai gambar PNG ke dalam buffer
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png")
+        buf.seek(0)
+
+        # Menampilkan tombol unduh untuk mengunduh chart sebagai file PNG
+        st.markdown("### Klik di bawah untuk mengunduh grafik sebagai PNG:")
+        st.download_button(
+            label="Download Chart as PNG",
+            data=buf,
+            file_name="chart.png",
+            mime="image/png"
+        )
+else:
+    st.info("Silakan upload file Excel untuk memulai visualisasi.")
+
